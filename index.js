@@ -51,6 +51,13 @@ app.delete("/api/notes/:id", (req, res) => {
 
 app.post("/api/notes", (req, res) => {
   const note = req.body;
+
+  if (!note || !note.content) {
+    return res.status(400).json({
+      error: "note.content is missing",
+    });
+  }
+
   const ids = notes.map((note) => note.id);
   const maxId = Math.max(...ids);
   const newNote = {
@@ -60,7 +67,7 @@ app.post("/api/notes", (req, res) => {
     date: new Date().toISOString(),
   };
   notes = [...notes, newNote];
-  res.json(newNote);
+  res.status(201).json(newNote);
 });
 
 const PORT = 3001;
