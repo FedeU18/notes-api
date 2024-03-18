@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 let notes = [
   {
     id: 1,
@@ -46,6 +48,8 @@ app.delete("/api/notes/:id", (req, res) => {
 
   res.status(204).end();
 });
+
+app.post("/api/notes", (req, res) => {});
 
 const PORT = 3001;
 app.listen(PORT, () => {
