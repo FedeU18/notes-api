@@ -49,7 +49,19 @@ app.delete("/api/notes/:id", (req, res) => {
   res.status(204).end();
 });
 
-app.post("/api/notes", (req, res) => {});
+app.post("/api/notes", (req, res) => {
+  const note = req.body;
+  const ids = notes.map((note) => note.id);
+  const maxId = Math.max(...ids);
+  const newNote = {
+    id: maxId + 1,
+    content: note.content,
+    important: typeof note.important !== "undefined" ? note.important : false,
+    date: new Date().toISOString(),
+  };
+  notes = [...notes, newNote];
+  res.json(newNote);
+});
 
 const PORT = 3001;
 app.listen(PORT, () => {
