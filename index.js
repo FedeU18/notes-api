@@ -30,6 +30,24 @@ app.get("/api/notes", (req, res) => {
   res.json(notes);
 });
 
+app.get("/api/notes/:id", (req, res) => {
+  const { id } = req.params;
+  const note = notes.find((note) => note.id === Number(id));
+  if (note) {
+    res.json(note);
+  } else {
+    res.status(404).end();
+  }
+});
+
+app.delete("/api/notes/:id", (req, res) => {
+  const { id } = req.params;
+  notes = notes.filter((note) => note.id !== Number(id));
+
+  res.status(204).end();
+});
+
 const PORT = 3001;
-app.listen(PORT);
-console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
