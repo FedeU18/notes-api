@@ -67,7 +67,7 @@ app.delete("/api/notes/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/notes", (req, res) => {
+app.post("/api/notes", (req, res, next) => {
   const note = req.body;
   if (!note || !note.content) {
     return res.status(400).json({
@@ -81,9 +81,12 @@ app.post("/api/notes", (req, res) => {
     important: note.important || false,
   });
 
-  newNote.save().then((savedNote) => {
-    res.json(savedNote);
-  });
+  newNote
+    .save()
+    .then((savedNote) => {
+      res.json(savedNote);
+    })
+    .catch((error) => next(error));
 });
 
 app.put("/api/notes/:id", (req, res, next) => {
@@ -94,9 +97,11 @@ app.put("/api/notes/:id", (req, res, next) => {
     content: newInfo.content,
     important: newInfo.important,
   };
-  Note.findByIdAndUpdate(id, NoteUpdated, { new: true }).then((result) => {
-    res.json(result).status(200);
-  });
+  Note.findByIdAndUpdate(id, NoteUpdated, { new: true })
+    .then((result) => {
+      res.json(result).status(200);
+    })
+    .catch((error) => next(error));
 });
 
 app.use(notFound);
