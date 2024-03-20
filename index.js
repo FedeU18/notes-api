@@ -57,11 +57,12 @@ app.get("/api/notes/:id", (req, res, next) => {
     });
 });
 
-app.delete("/api/notes/:id", (req, res) => {
+app.delete("/api/notes/:id", (req, res, next) => {
   const { id } = req.params;
-  notes = notes.filter((note) => note.id !== Number(id));
 
-  res.status(204).end();
+  Note.findByIdAndDelete(id)
+    .then((result) => res.status(204).end())
+    .catch((error) => next(error));
 });
 
 app.post("/api/notes", (req, res) => {
@@ -80,6 +81,19 @@ app.post("/api/notes", (req, res) => {
 
   newNote.save().then((savedNote) => {
     res.json(savedNote);
+  });
+});
+
+app.put("/api/notes/:id", (req, res, next) => {
+  const { id } = req.params;
+  const newInfo = req.body;
+
+  const NoteUpdated = {
+    content: newInfo.content,
+    important: newInfo.important,
+  };
+  Note.findByIdAndUpdate(id, NoteUpdated).then((result) => {
+    res.json(result).status(200);
   });
 });
 
