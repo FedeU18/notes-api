@@ -92,9 +92,13 @@ app.put("/api/notes/:id", (req, res, next) => {
     content: newInfo.content,
     important: newInfo.important,
   };
-  Note.findByIdAndUpdate(id, NoteUpdated).then((result) => {
+  Note.findByIdAndUpdate(id, NoteUpdated, { new: true }).then((result) => {
     res.json(result).status(200);
   });
+});
+
+app.use((req, res, next) => {
+  res.status(404).end;
 });
 
 app.use((error, req, res, next) => {
