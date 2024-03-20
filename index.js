@@ -6,6 +6,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const Note = require("./models/Note");
+const notFound = require("./middleware/notFound");
+const handleErrors = require("./middleware/handleErrors");
 
 app.use(cors());
 app.use(express.json());
@@ -97,18 +99,9 @@ app.put("/api/notes/:id", (req, res, next) => {
   });
 });
 
-app.use((req, res, next) => {
-  res.status(404).end;
-});
+app.use(notFound);
 
-app.use((error, req, res, next) => {
-  console.log(error);
-  if (error.name === "CastError") {
-    res.status(400).send({ error: "id used is malformed" });
-  } else {
-    res.status(500).end;
-  }
-});
+app.use(handleErrors);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
