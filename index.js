@@ -41,14 +41,20 @@ app.get("/api/notes", (req, res) => {
   });
 });
 
-app.get("/api/notes/:id", (req, res) => {
+app.get("/api/notes/:id", (req, res, next) => {
   const { id } = req.params;
-  const note = notes.find((note) => note.id === Number(id));
-  if (note) {
-    res.json(note);
-  } else {
-    res.status(404).end();
-  }
+
+  Note.findById(id)
+    .then((note) => {
+      if (note) {
+        res.json(note);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.delete("/api/notes/:id", (req, res) => {
@@ -60,23 +66,30 @@ app.delete("/api/notes/:id", (req, res) => {
 
 app.post("/api/notes", (req, res) => {
   const note = req.body;
-
   if (!note || !note.content) {
     return res.status(400).json({
       error: "note.content is missing",
     });
   }
 
-  const ids = notes.map((note) => note.id);
-  const maxId = Math.max(...ids);
-  const newNote = {
-    id: maxId + 1,
+  const newNote = new Note({
     content: note.content,
-    important: typeof note.important !== "undefined" ? note.important : false,
-    date: new Date().toISOString(),
-  };
-  notes = [...notes, newNote];
-  res.status(201).json(newNote);
+    date: new Date(),
+    important: note.important || false,
+  });
+
+  newNote.save().then((savedNote) => {
+    res.json(savedNote);
+  });
+});
+
+app.use((error, req, res, next) => {
+  console.log(error);
+  if (error.name === "CastError") {
+    res.status(400).send({ error: "id used is malformed" });
+  } else {
+    res.status(500).end;
+  }
 });
 
 const PORT = process.env.PORT || 3001;
